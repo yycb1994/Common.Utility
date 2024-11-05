@@ -196,6 +196,16 @@ namespace Common.Utility.Helper
             return Path.Combine(directoryPath, Path.GetFileName(filePath));
         }
 
+        public static void CreateFile(string filePath)
+        {
+            if (File.Exists(filePath)) return;
+            FileInfo fileInfo = new FileInfo(filePath);
+            using (FileStream fs = fileInfo.Create())
+            {
+
+            }
+        }
+
         /// <summary>
         /// 将文件按照自定义格式进行命名备份，并可选择备份到指定路径。
         /// </summary>
