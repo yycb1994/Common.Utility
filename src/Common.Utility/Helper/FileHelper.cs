@@ -104,6 +104,17 @@ namespace Common.Utility.Helper
 
         }
 
+        /// <summary>
+        /// 根据文件夹路径获取该文件夹内所有的文件
+        /// </summary>
+        /// <param name="dirPath">文件夹路径</param>
+        /// <returns>文件信息数组</returns>
+        public static FileInfo[] GetFiles(this string dirPath)
+        {
+            DirectoryInfo subdirectoryFolder = new DirectoryInfo(dirPath);
+            FileInfo[] files = subdirectoryFolder.GetFiles();
+            return files;
+        }
 
         /// <summary>
         /// 检查指定路径的文件是否存在.
@@ -258,19 +269,36 @@ namespace Common.Utility.Helper
         /// </summary>
         /// <param name="sourceFilePath">源文件的路径。</param>
         /// <param name="destinationFilePath">目标文件的路径(要带名字)。</param>
-        public static void MoveFile(string sourceFilePath, string destinationFilePath)
+        /// <param name="overwrite">如果文件已存在，是否覆盖。</param>
+        public static void MoveFile(string sourceFilePath, string destinationFilePath, bool overwrite = true)
         {
             // 检查源文件是否存在
             if (!File.Exists(sourceFilePath))
             {
                 throw new FileNotFoundException("源文件不存在。", sourceFilePath);
             }
+            
             if (sourceFilePath == destinationFilePath)
             {
                 return;
             }
-            // 移动文件
-            File.Move(sourceFilePath, destinationFilePath);
+            // 检查目标文件是否存在
+            if (File.Exists(destinationFilePath))
+            {
+                if (overwrite)
+                {
+                    // 如果允许覆盖，先删除目标文件，然后移动源文件到目标位置
+                    File.Delete(destinationFilePath);
+                    File.Move(sourceFilePath, destinationFilePath);
+                    Console.WriteLine("文件成功移动并覆盖目标文件。");
+                }               
+            }
+            else
+            {
+                // 目标文件不存在，直接移动源文件到目标位置
+                File.Move(sourceFilePath, destinationFilePath);
+                Console.WriteLine("文件成功移动到目标位置。");
+            }
         }
 
         /// <summary>
@@ -278,7 +306,8 @@ namespace Common.Utility.Helper
         /// </summary>
         /// <param name="sourceFilePath">源文件的路径。</param>
         /// <param name="destinationFilePath">目标文件的路径(要带名字)。</param>
-        public static void CopyFile(string sourceFilePath, string destinationFilePath)
+        /// <param name="overwrite">如果文件已存在，是否覆盖。</param>
+        public static void CopyFile(string sourceFilePath, string destinationFilePath,bool overwrite=true)
         {
             // 检查源文件是否存在
             if (!File.Exists(sourceFilePath))
@@ -287,7 +316,7 @@ namespace Common.Utility.Helper
             }
             if (sourceFilePath == destinationFilePath) return;
             // 复制文件
-            File.Copy(sourceFilePath, destinationFilePath);
+            File.Copy(sourceFilePath, destinationFilePath, overwrite);
         }
 
         /// <summary>
@@ -401,17 +430,12 @@ namespace Common.Utility.Helper
             {
                 return;
             }
+
+
+            // 删除符合过滤器条件的文件
             foreach (string file in Directory.GetFiles(path))
             {
-                filter.ToList().ForEach(f =>
-                {
-                    if (file.Contains(f))
-                    {
-                        File.Delete(file);
-                    }
-                });
-
-                if (filter.Contains("*.*"))
+                if (filter.Any(f => f == "*.*" || file.Contains(f)))
                 {
                     File.Delete(file);
                 }
@@ -420,12 +444,24 @@ namespace Common.Utility.Helper
             {
                 try
                 {
-                    AutomaticCleaning(subfolder);
+                    AutomaticCleaning(subfolder, filter);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception($"无法删除文件夹 '{subfolder}': {ex.Message}");
                 }
+            }
+
+            try
+            {
+                if (Directory.GetFiles(path).Length == 0 && Directory.GetDirectories(path).Length == 0)
+                {
+                    Directory.Delete(path);
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"无法删除目录 '{path}': {ex.Message}");
             }
         }
         /// <summary>
