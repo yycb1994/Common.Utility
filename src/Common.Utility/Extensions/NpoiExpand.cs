@@ -717,16 +717,23 @@ namespace Common.Utility.Extensions
 
         public static void InsertRow(this ISheet sheet, int rowIndex, int n)
         {
+            rowIndex = rowIndex + 1;
             if (n <= 0)
             {
-                throw new Exception("要插入的新行数量必须大于0");
+                throw new ArgumentException("要插入的新行数量必须大于0");
             }
-            sheet.ShiftRows(rowIndex + 1, sheet.LastRowNum, n, true, false);
+            // 确保 rowIndex 在有效范围内
+            if (rowIndex < 0 || rowIndex > sheet.LastRowNum + 1)
+            {
+                throw new ArgumentOutOfRangeException("rowIndex", "行索引超出范围");
+            }
+
+            sheet.ShiftRows(rowIndex, rowIndex + 1, n, true, false);
 
             // 根据需要插入新行
             for (int i = 0; i < n; i++)
             {
-                sheet.CreateRow(rowIndex + 1 + i);
+                sheet.CreateRow(rowIndex + i);
             }
         }
 
@@ -739,6 +746,13 @@ namespace Common.Utility.Extensions
         /// <param name="isCopyCellValue">是否复制单元格的值</param>
         public static void CopyRow(this ISheet targetSheet, int sourceRowNum, int targetRowNum, bool isCopyCellValue = false)
         {
+           var f= targetSheet.RowExist(targetRowNum).FirstCellNum;
+            var l =targetSheet.RowExist(targetRowNum).LastCellNum;
+           
+            if (targetRowNum < 0 || targetRowNum > targetSheet.LastRowNum)
+            {
+                throw new ArgumentOutOfRangeException("targetRowIndex", "目标行索引超出范围");
+            }
             targetSheet.CopyRow(sourceRowNum, targetRowNum);
             if (!isCopyCellValue)
             {

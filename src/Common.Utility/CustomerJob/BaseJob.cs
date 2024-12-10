@@ -2,8 +2,10 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Common.Utility.CustomerEnum;
+using Common.Utility.CustomerModel;
 using Common.Utility.Helper;
 using Quartz;
+using static Quartz.Logging.OperationName;
 
 namespace Common.Utility.CustomerJob
 {
@@ -12,8 +14,8 @@ namespace Common.Utility.CustomerJob
         public static readonly ConcurrentDictionary<string, Action> Delegates = new ConcurrentDictionary<string, Action>();
         public async Task Execute(IJobExecutionContext context)
         {
-            Console.WriteLine("执行BaseJob任务");
 
+            JobLogger logger = new JobLogger("JobExecutionLog");
             JobDataMap dataMap = context.JobDetail.JobDataMap;
             var key = dataMap.GetString("delegateKey");
 
@@ -28,17 +30,21 @@ namespace Common.Utility.CustomerJob
                             Delegates.TryRemove(jobInfo.JobName, out var a);
                         }
                     }
+                    await logger.Information($"{key}任务说明：{job.Description}");
+                    await logger.Information($"{key}上一次执行时间：{job.LastExecutionTime}");
+                    await logger.Information($"开始执行{key}任务");
                     action.Invoke();
-                    Console.WriteLine("任务执行完成 " + DateTime.Now);
+                    await logger.Information($"{key}任务执行完成 " + DateTime.Now);
+                    QuartzHelper.JobDic[key].LastExecutionTime = DateTime.Now;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("执行任务时发生错误: " + ex.Message);
+                    await logger.Error($"{key}执行任务时发生错误: ", ex);
                 }
             }
             else
             {
-                Console.WriteLine("未找到对应的委托");
+                await logger.Information($"未找到对应的{key}任务");
             }
 
             // 可以在这里考虑移除已经执行过的委托

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.CoreApp", "..\Conso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.FrameworkApp1", "..\Console.FrameworkApp1\Console.FrameworkApp1.csproj", "{E93BAD61-8337-4D65-97A8-E2E165986817}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Repositoy.SqlSugar", "..\Common.Repositoy.SqlSugar\Common.Repositoy.SqlSugar.csproj", "{AE0B6415-913E-4919-8FED-F1560C9658E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Repositoy.SqlSugar.Core", "..\Common.Repositoy.SqlSugar.Core\Common.Repositoy.SqlSugar.Core.csproj", "{0742939C-8ED6-4230-BE88-0134F6E40088}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{E93BAD61-8337-4D65-97A8-E2E165986817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E93BAD61-8337-4D65-97A8-E2E165986817}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E93BAD61-8337-4D65-97A8-E2E165986817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE0B6415-913E-4919-8FED-F1560C9658E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0B6415-913E-4919-8FED-F1560C9658E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0B6415-913E-4919-8FED-F1560C9658E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0B6415-913E-4919-8FED-F1560C9658E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0742939C-8ED6-4230-BE88-0134F6E40088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0742939C-8ED6-4230-BE88-0134F6E40088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0742939C-8ED6-4230-BE88-0134F6E40088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0742939C-8ED6-4230-BE88-0134F6E40088}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

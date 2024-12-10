@@ -1,12 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Common.Utility.Extensions
 {
     public static class StringExpand
     {
+
+        /// <summary>
+        /// 检查字符串是否为null。
+        /// </summary>
+        /// <param name="str">要检查的字符串。</param>
+        /// <returns>如果字符串为null，则返回true；否则返回false。</returns>
+        public static bool IsNull(this string str)
+        {
+            return str == null;
+        }
+
+        /// <summary>
+        /// 检查字符串是否为null或空字符串。
+        /// </summary>
+        /// <param name="str">要检查的字符串。</param>
+        /// <returns>如果字符串为null或空字符串，则返回true；否则返回false。</returns>
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        /// 检查字符串是否为null、空字符串或仅包含空白字符。
+        /// </summary>
+        /// <param name="str">要检查的字符串。</param>
+        /// <returns>如果字符串为null、空字符串或仅包含空白字符，则返回true；否则返回false。</returns>
+        public static bool IsNullOrWhiteSpace(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str);
+        }
+
         /// <summary>
         /// 将指定的字符串追加到当前字符串中，不添加任何分隔符。
         /// </summary>
@@ -154,6 +186,25 @@ namespace Common.Utility.Extensions
             }
 
             return stringBuilder.Length > 0 ? stringBuilder.ToString() : null;
+        }
+
+        /// <summary>
+        /// 生成一个32字节的随机密钥。
+        /// </summary>
+        /// <returns>生成的随机密钥（以十六进制字符串形式表示）。</returns>
+        public static string GenerateRandomKey()
+        {
+            // 创建一个32字节的字节数组
+            byte[] key = new byte[32];
+
+            // 使用加密随机数生成器填充字节数组
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(key);
+            }
+
+            // 将字节数组转换为十六进制字符串
+            return BitConverter.ToString(key).Replace("-", "").ToLowerInvariant();
         }
     }
 }

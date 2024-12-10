@@ -6,6 +6,7 @@ using Common.Utility.CustomerJob;
 using Common.Utility.CustomerModel;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Util;
 
 
 namespace Common.Utility.Helper
@@ -39,8 +40,20 @@ namespace Common.Utility.Helper
         /// <returns>任务名称。</returns>
         public static async Task<string> AddJob(string jobName, string groupName, string cronExpression, Action action, string description = "")
         {
+            if (JobDic.TryGetValue(jobName, out var jobinfo))
+            {
+                if (jobinfo.Status == JobStatus.已结束)
+                {
+                    JobDic.TryRemove(jobName, out var a);
+                }
+                else
+                {
+                    throw new ObjectAlreadyExistsException($"Unable to store Job: '{jobName}', because one already exists with this identification.");
+                }
+
+            }
             // 创建委托的唯一键
-            var delegateKey = Guid.NewGuid().ToString();
+            var delegateKey = Guid.NewGuid().ToString();    
             // 将委托存储在静态字典中
             BaseJob.Delegates[jobName] = action;
             // 创建作业信息并保存到列表

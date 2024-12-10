@@ -466,6 +466,27 @@ namespace Common.Utility.Extensions
 
             return dic;
         }
+
+
+        /// <summary>
+        /// 将 DataTable 中的列名修改为指定的新列名。
+        /// </summary>
+        /// <param name="dataTable">要修改列名的 DataTable 对象。</param>
+        /// <param name="columnMappings">包含要修改的列名映射关系的字典，键为旧列名，值为新列名。</param>
+        public static void RenameColumns(this DataTable dataTable, Dictionary<string, string> columnMappings)
+        {
+            foreach (var mapping in columnMappings)
+            {
+                if (dataTable.Columns.Contains(mapping.Key))
+                {
+                    dataTable.Columns[mapping.Key].ColumnName = mapping.Value;
+                }
+                else
+                {
+                    Console.WriteLine($"列 '{mapping.Key}' 在 DataTable 中未找到。");
+                }
+            }
+        }
     }
 
 

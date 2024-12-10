@@ -4,8 +4,10 @@ using SharpCompress.Common;
 using SharpCompress.Writers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -300,6 +302,66 @@ namespace Common.Utility.Helper
                 Console.WriteLine("文件成功移动到目标位置。");
             }
         }
+        /// <summary>
+        /// 将文件从源路径移动到目标路径
+        /// </summary>
+        /// <param name="sourceFilePath">源文件路径</param>
+        /// <param name="destinationFilePath">目标文件路径</param>
+        /// <param name="username">共享目录用户名</param>
+        /// <param name="password">共享目录密码</param>
+        public static void MoveFileForWindows(string sourceFilePath, string destinationFilePath, string username, string password)
+        {
+            // 检查源文件是否存在
+            if (!File.Exists(sourceFilePath))
+            {
+                throw new FileNotFoundException("源文件不存在。", sourceFilePath);
+            }
+
+            // 获取目标文件夹路径
+            string destinationFolderPath = Path.GetDirectoryName(destinationFilePath);
+            if (string.IsNullOrEmpty(destinationFolderPath))
+            {
+                throw new ArgumentException("目标文件路径无效。", nameof(destinationFilePath));
+            }
+
+            // 使用 net use 命令连接到共享目录
+            string netUseCommand = $"net use \"{destinationFolderPath}\" \"{password}\" /user:\"{username}\"";
+            ExecuteCommand(netUseCommand);
+
+            try
+            {
+                // 移动文件
+                File.Move(sourceFilePath, destinationFilePath);
+            }
+            finally
+            {
+                // 断开连接
+                string netUseDisconnectCommand = $"net use \"{destinationFolderPath}\" /delete";
+                ExecuteCommand(netUseDisconnectCommand);
+            }
+        }
+
+        private static void ExecuteCommand(string command)
+        {
+            var processInfo = new ProcessStartInfo("cmd.exe", "/C " + command)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(processInfo))
+            {
+                process.WaitForExit();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"命令执行失败: {error}");
+                }
+            }
+        }
 
         /// <summary>
         /// 复制文件从一个位置到另一个位置。
@@ -318,6 +380,47 @@ namespace Common.Utility.Helper
             // 复制文件
             File.Copy(sourceFilePath, destinationFilePath, overwrite);
         }
+
+        /// <summary>
+        /// 将文件复制到远程共享目录
+        /// </summary>
+        /// <param name="sourceFilePath">源文件路径</param>
+        /// <param name="destinationFilePath">目标文件路径</param>
+        /// <param name="username">共享目录用户名</param>
+        /// <param name="password">共享目录密码</param>
+        public static void CopyFileForWindows(string sourceFilePath, string destinationFilePath, string username, string password)
+        {
+            // 检查源文件是否存在
+            if (!File.Exists(sourceFilePath))
+            {
+                throw new FileNotFoundException("源文件不存在。", sourceFilePath);
+            }
+
+            // 获取目标文件夹路径
+            string destinationFolderPath = Path.GetDirectoryName(destinationFilePath);
+            if (string.IsNullOrEmpty(destinationFolderPath))
+            {
+                throw new ArgumentException("目标文件路径无效。", nameof(destinationFilePath));
+            }
+
+            // 使用 net use 命令连接到共享目录
+            string netUseCommand = $"net use \"{destinationFolderPath}\" \"{password}\" /user:\"{username}\"";
+            ExecuteCommand(netUseCommand);
+
+            try
+            {
+                // 复制文件
+                File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
+            }
+            finally
+            {
+                // 断开连接
+                string netUseDisconnectCommand = $"net use \"{destinationFolderPath}\" /delete";
+                ExecuteCommand(netUseDisconnectCommand);
+            }
+        }
+
+
 
         /// <summary>
         /// 将给定的字节数组保存为指定路径的文件。

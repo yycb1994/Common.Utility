@@ -61,17 +61,9 @@ namespace Common.Utility.Helper
 
         public virtual void OnProcess(object source, FileSystemEventArgs e)
         {
-            try
+            if (e.ChangeType == WatcherChangeTypes.Created)
             {
-                if (e.ChangeType == WatcherChangeTypes.Created)
-                {
-                    Console.WriteLine($"监视到新文件：{e.FullPath}");
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw;
+                Console.WriteLine($"监视到新文件：{e.FullPath}");
             }
         }
     }
