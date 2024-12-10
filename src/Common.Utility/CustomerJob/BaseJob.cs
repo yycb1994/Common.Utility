@@ -30,6 +30,7 @@ namespace Common.Utility.CustomerJob
                             Delegates.TryRemove(jobInfo.JobName, out var a);
                         }
                     }
+                    var job = QuartzHelper.JobDic[key];
                     await logger.Information($"{key}任务说明：{job.Description}");
                     await logger.Information($"{key}上一次执行时间：{job.LastExecutionTime}");
                     await logger.Information($"开始执行{key}任务");
