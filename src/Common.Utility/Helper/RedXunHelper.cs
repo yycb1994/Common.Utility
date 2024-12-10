@@ -129,9 +129,28 @@ namespace Common.Utility.Helper
             return (fileName, extension);
         }
 
+        public SysFileJsonVo UploadFileAndGetFileObj(string filePath)
+        {
+            string token = GetToken();
+            string value = UploadFile(filePath);
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new Exception(filePath + " ->The interface did not respond during the file upload process");
+            }
 
+            JToken jToken = ((JArray)JsonConvert.DeserializeObject<JObject>(value)["data"])[0];
+            SysFileJsonVo value2 = new SysFileJsonVo
+            {
+                fileName = jToken["fileName"].ToString(),
+                fileId = jToken["fileId"].ToString(),
+                createTime = DateTime.Now,
+                size = (int)jToken["totalBytes"],
+                createUser = "RedXunService"
+            };
+            return value2;
+        }
 
-        (string fileJson, string fileId) UploadFileAndGetFileJson(string filePath)
+        public (string fileJson, string fileId) UploadFileAndGetFileJson(string filePath)
         {
             string text = null;
             try
