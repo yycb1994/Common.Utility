@@ -27,21 +27,25 @@ namespace Common.Utility.Helper
         public async Task Information(string message)
         {
             await LogAsync("INFO", message);
+            await Task.CompletedTask;
         }
 
         public async Task Error(string message, Exception ex)
         {
             await LogAsync("ERROR", $"{message} | Exception: {ex.Message}");
+            await Task.CompletedTask;
         }
 
         public async Task Warning(string message)
         {
             await LogAsync("WARNING", message);
+            await Task.CompletedTask;
         }
 
         public async Task Debug(string message)
         {
             await LogAsync("DEBUG", message);
+            await Task.CompletedTask;
         }     
 
         public async Task LogAsync(string level, string message)
@@ -57,6 +61,7 @@ namespace Common.Utility.Helper
                     using (var writer = new StreamWriter(stream))
                     {
                         await writer.WriteLineAsync(logMessage);
+                        await Task.CompletedTask;
                     }
                     break; // 如果成功写入，退出循环
                 }
@@ -70,6 +75,7 @@ namespace Common.Utility.Helper
                     }
                 }
             }
+
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -68,5 +71,38 @@ namespace Common.Utility.Extensions
         {
             return index >= 0 && index < collection.Count;
         }
+
+        public static void ExportToExcel<T>(this IList<T> list, string filePath)
+        {
+            using (IWorkbook workbook = new XSSFWorkbook())
+            {
+                ISheet sheet = workbook.CreateSheet(typeof(T).Name);
+
+                // 创建表头
+                IRow headerRow = sheet.CreateRow(0);
+                var properties = typeof(T).GetProperties();
+
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    headerRow.CreateCell(i).SetCellValue(properties[i].Name);
+                }
+
+                // 填充数据
+                for (int i = 0; i < list.Count; i++)
+                {
+                    IRow row = sheet.CreateRow(i + 1); // 从第二行开始填充数据
+                    for (int j = 0; j < properties.Length; j++)
+                    {
+                        var value = properties[j].GetValue(list[i]);
+                        row.CreateCell(j).SetCellValue(value?.ToString());
+                    }
+                }
+
+                // 写入到文件
+                workbook.SaveExcelToFile(filePath);
+            };
+            
+        }
     }
+
 }
