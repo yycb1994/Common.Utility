@@ -1,4 +1,5 @@
 ﻿using Common.Utility.Helper;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -1307,6 +1308,119 @@ namespace Common.Utility.Extensions
             }
 
             return dataTable;
+        }
+
+
+        /// <summary>
+        /// 将 DataTable 导出到 Excel 文件（所有数据在一个文件中）。
+        /// </summary>
+        /// <param name="dataTable">要导出的数据表。</param>
+        /// <param name="filePath">要保存的 Excel 文件路径。</param>
+        /// <exception cref="Exception">如果文件扩展名不支持，将抛出异常。</exception>
+        public static void ExportToExcelAll(this DataTable dataTable, string filePath)
+        {
+            IWorkbook workbook;
+            // 根据文件扩展名选择工作簿类型
+            if (Path.GetExtension(filePath).ToLower() == ".xlsx")
+            {
+                workbook = new XSSFWorkbook(); // 创建 .xlsx 工作簿
+            }
+            else if (Path.GetExtension(filePath).ToLower() == ".xls")
+            {
+                workbook = new HSSFWorkbook(); // 创建 .xls 工作簿
+            }
+            else
+            {
+                throw new Exception("Unsupported file extension. Please use .xls or .xlsx");
+            }
+
+            ISheet sheet = workbook.CreateSheet("Sheet1");
+
+            // 创建表头
+            IRow headerRow = sheet.CreateRow(0);
+            for (int i = 0; i < dataTable.Columns.Count; i++)
+            {
+                headerRow.CreateCell(i).SetCellValue(dataTable.Columns[i].ColumnName);
+            }
+
+            // 填充数据
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                IRow dataRow = sheet.CreateRow(i + 1); // 从第二行开始填充数据
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                {
+                    dataRow.CreateCell(j).SetCellValue(dataTable.Rows[i][j].ToString());
+                }
+            }
+            workbook.SaveExcelToFile(filePath);
+        }
+
+        /// <summary>
+        /// 将 DataTable 导出到多个 Excel 文件，每个文件最多包含指定行数的数据。
+        /// </summary>
+        /// <param name="dataTable">要导出的数据表。</param>
+        /// <param name="baseFilePath">基础文件路径，用于生成文件名。</param>
+        /// <param name="maxRowsPerFile">每个文件的最大行数，默认为 0（表示所有数据在一个文件中）。</param>
+        /// <exception cref="Exception">如果文件扩展名不支持，将抛出异常。</exception>
+        public static void ExportToExcel(this DataTable dataTable, string baseFilePath, int maxRowsPerFile = 0)
+        {
+         
+            // 根据文件扩展名选择工作簿类型
+            string fileExtension = Path.GetExtension(baseFilePath).ToLower();
+            IWorkbook workbook;
+
+            if (fileExtension == ".xlsx")
+            {
+                workbook = new XSSFWorkbook(); // 创建 .xlsx 工作簿
+            }
+            else if (fileExtension == ".xls")
+            {
+                workbook = new HSSFWorkbook(); // 创建 .xls 工作簿
+            }
+            else
+            {
+                throw new Exception("Unsupported file extension. Please use .xls or .xlsx");
+            }
+
+            int totalRows = dataTable.Rows.Count;
+            int fileCount = maxRowsPerFile == 0 ? 1 : totalRows.CalculatePageCount(maxRowsPerFile); // 计算需要创建的文件数量
+
+            for (int fileIndex = 0; fileIndex < fileCount; fileIndex++)
+            {
+                // 创建新的工作表
+                ISheet sheet = workbook.CreateSheet("Sheet1");
+
+                // 创建表头
+                IRow headerRow = sheet.CreateRow(0);
+                for (int colIndex = 0; colIndex < dataTable.Columns.Count; colIndex++)
+                {
+                    headerRow.CreateCell(colIndex).SetCellValue(dataTable.Columns[colIndex].ColumnName);
+                }
+
+                // 填充数据
+                int startRow = fileIndex * maxRowsPerFile;
+                int endRow = Math.Min(startRow + maxRowsPerFile, totalRows);
+                for (int rowIndex = startRow; rowIndex < endRow; rowIndex++)
+                {
+                    IRow dataRow = sheet.CreateRow(rowIndex - startRow + 1); // 从第二行开始填充数据
+                    for (int colIndex = 0; colIndex < dataTable.Columns.Count; colIndex++)
+                    {
+                        dataRow.CreateCell(colIndex).SetCellValue(dataTable.Rows[rowIndex][colIndex]?.ToString());
+                    }
+                }
+
+                // 保存当前工作簿到文件
+                string filePath = Path.Combine(Path.GetDirectoryName(baseFilePath),
+                    $"{Path.GetFileNameWithoutExtension(baseFilePath)}_{fileIndex + 1}{fileExtension}");
+
+                workbook.SaveExcelToFile(filePath);
+                // 清空工作簿以便下一个文件使用
+                // 根据文件扩展名选择工作簿类型
+                workbook = fileExtension == ".xlsx"
+                    ? (IWorkbook)new XSSFWorkbook()
+                    : (IWorkbook)new HSSFWorkbook();
+
+            }
         }
 
         #endregion

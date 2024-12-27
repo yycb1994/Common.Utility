@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Repositoy.SqlSugar.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Ioc.AutoFac", "..\Common.Ioc.AutoFac\Common.Ioc.AutoFac.csproj", "{10935EBD-2785-48E6-A5C1-48750DA547E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "..\ConsoleApp1\ConsoleApp1.csproj", "{BC56DD4D-ED20-4D7A-9681-5E339B771B37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{10935EBD-2785-48E6-A5C1-48750DA547E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10935EBD-2785-48E6-A5C1-48750DA547E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10935EBD-2785-48E6-A5C1-48750DA547E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC56DD4D-ED20-4D7A-9681-5E339B771B37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC56DD4D-ED20-4D7A-9681-5E339B771B37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC56DD4D-ED20-4D7A-9681-5E339B771B37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC56DD4D-ED20-4D7A-9681-5E339B771B37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

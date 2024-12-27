@@ -38,7 +38,7 @@ namespace Common.Utility.Helper
         /// <param name="action">要执行的动作。</param>
         /// <param name="description">任务描述。</param>
         /// <returns>任务名称。</returns>
-        public static async Task<string> AddJob(string jobName, string groupName, string cronExpression, Action action, string description = "")
+        public static async Task<string> AddJobAsync(string jobName, string groupName, string cronExpression, Func<Task> action, string description = "")
         {
             if (JobDic.TryGetValue(jobName, out var jobinfo))
             {
@@ -50,14 +50,22 @@ namespace Common.Utility.Helper
                 {
                     throw new ObjectAlreadyExistsException($"Unable to store Job: '{jobName}', because one already exists with this identification.");
                 }
-
             }
+
             // 创建委托的唯一键
-            var delegateKey = Guid.NewGuid().ToString();    
+            var delegateKey = Guid.NewGuid().ToString();
             // 将委托存储在静态字典中
             BaseJob.Delegates[jobName] = action;
             // 创建作业信息并保存到列表
-            var jobInfo = new JobInfoVo { JobName = jobName, GroupName = groupName, CronExpression = cronExpression, Status = JobStatus.正常运行, Description = description, JobCreateTime = DateTime.Now };
+            var jobInfo = new JobInfoVo
+            {
+                JobName = jobName,
+                GroupName = groupName,
+                CronExpression = cronExpression,
+                Status = JobStatus.正常运行,
+                Description = description,
+                JobCreateTime = DateTime.Now
+            };
             JobDic.TryAdd(jobName, jobInfo);
 
             // 创建Quartz作业和触发器
@@ -69,7 +77,8 @@ namespace Common.Utility.Helper
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity(jobName + "Trigger", groupName)
                 .StartNow()
-                .WithCronSchedule(cronExpression).WithDescription(description)
+                .WithCronSchedule(cronExpression)
+                .WithDescription(description)
                 .Build();
 
             await Scheduler.ScheduleJob(job, trigger);

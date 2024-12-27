@@ -29,7 +29,7 @@
     <PackageReference Include="System.Data.Odbc" Version="8.0.1" />
     <PackageReference Include="System.Data.OleDb" Version="8.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.0" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Channels" Version="4.7.0" />
   </ItemGroup>
 
 </Project>
